@@ -6,11 +6,12 @@
    :else 1))
 
 (defn levenstein-distance [x y]
-  (cond
-   (empty? x) (count y)
-   (empty? y) (count x)
-   :else (min
-          (+ 1 (levenstein-distance (subs x 1) y))
-          (+ 1 (levenstein-distance x (subs y 1)))
-          (+ (head-cost x y) (levenstein-distance (subs x 1) (subs y 1)))
-          )))
+  (with-local-vars [lev (memoize (fn [x y]
+                       (cond
+                        (empty? x) (count y)
+                        (empty? y) (count x)
+                        :else (min
+                               (+ 1 (lev (subs x 1) y))
+                               (+ 1 (lev x (subs y 1)))
+                               (+ (head-cost x y) (lev (subs x 1) (subs y 1)))))))]
+    (lev x y)))
